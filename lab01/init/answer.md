@@ -7,7 +7,7 @@
 ## 1. 目录
 
 ```shell
--- 学号_姓名_lab01.zip
+-- 1-学号-姓名.zip
     |-- answer.pdf
     |-- oo
         |-- 1
