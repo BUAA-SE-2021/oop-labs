@@ -11,8 +11,29 @@
 - 将接口用作类型、使用接口回调
 - 理解并掌握接口的继承
 - 面向接口的编程
+- 简单了解 Object 类
+- 掌握良好重写 Object 类中方法的能力
+- 简单了解内部类、匿名类
 
 ## 实验题目
+
+> 本实验假设你明白：
+> - 涉及内部类时的初始化过程
+> - 内部类能够访问其外部类的所有属性和方法
+> - 构造内部类必须先构造外部类对象
+> - 嵌套类（静态内部类）只能够访问外部类的静态属性和方法
+> - 嵌套类可以直接通过类名构造
+> - 匿名内部类和局部内部类中直接使用的外部数据必须是 final 的（除非是匿名类的方法 的参数）
+    > 上述这些语法层面的东西，可以尝试自行证明。
+
+
+> 本次实验不会涉及以下内部类的常用技巧：
+> - 回调与闭包
+> - 事件与控制框架
+>
+> 也不会涉及以下内部类的边角情况：
+> - 内部类的继承与覆盖
+> - 多重嵌套的内部类
 
 ### 1. 多态1 `输出/简答题`
 
@@ -265,6 +286,81 @@ class Test23 implements I2, I3 {
     + 比如 class A implements I1，class B extends A implements I2
     + 更多情况请自行尝试并理解。
 
+### 7. InnerClass1 `代码补全|填空题`
+
+阅读下面这段代码：
+
+```java
+// Test.java
+class Outer {
+  public int num = 10;
+
+  class Inner {
+	public int num = 20;
+
+	public void show() {
+	  int num = 30;
+	  System.out.println(/* block1 */);
+	  System.out.println(/* block2 */);
+	  System.out.println(/* block3 */);
+	}
+  }
+}
+
+public class Test {
+  public static void main(String[] args) {
+	Outer.Inner oi = /* block4 */;
+	oi.show();
+  }
+}
+```
+
+在 oo/01/Test.java 中的注释部分填代码，使程序先后输出 30、20、10。
+
+- 填空：
+    + block1: `________`
+    + block2: `________`
+    + block3: `________`
+    + block4: `________`
+
+#### 注意
+
+- **不允许**修改已经有的代码
+- 考察的是内部类的构造以及访问外部类的方法，请**不要用加减运算这种操作**
+
+### 8. InnerClass2
+
+阅读下面这段代码：
+
+```java
+// Test.java
+interface Inter {
+  void show();
+}
+
+class Outer {
+  /* block */
+}
+
+public class Test {
+  public static void main(String[] args) {
+	Outer.method().show();
+  }
+}
+```
+
+在 oo/02/Test.java 中的注释部分填代码，使程序输出"oo"
+
+- 填空
+```java
+// fill the block with java code
+```
+
+#### 注意
+- **不允许**修改已经有的代码
+- 考察的是匿名类，但是用内部类也可以实现
+
+
 ## 附加题
 
 > 附加题可以在时间不充足时先略过，但请务必在完成作业期间或者完成后完成一遍，附加题包括的知识点并不重复，甚至更为重要，放到附加题不代表这些题是不重要的
@@ -308,7 +404,7 @@ TextProcessor。如果出现了不得不同时继承多个类的情况，后续�
 为每一种形状编写它的工厂类：
 
 - 比如生成矩形的工厂类 `RectangleFactory` 要 implements 接口 `IShapeFactory`。
-  
+
 编写测试类 `ShapeFactoriesTest`：
 
 - 具有 static 方法 `Shape makeShape(IShapeFactory factory, double a, double b)` ，在其中使用 `factory.makeShape(a, b)`方法生成形状并返回
@@ -327,3 +423,26 @@ TextProcessor。如果出现了不得不同时继承多个类的情况，后续�
 第五题中的方法，需要使用诸如 ShapeType 的标准来指定类型，这就导致了如果有新 的需求（新的形状种类）出现，整个 ShapeFactory
 类都要重新编写并编译。而使用工厂方法模式，你需要做的是编写一个新的工厂类并编译这个新的类，对原有的工厂代码无需进行修改（重构过图书馆的同学应该能体会到“不用修改代码”是一种多么幸福的事）。编写的时候可能觉得引入过多的类比较反人类，但是程序不是开发出来就完事了，还有维护和迭代更新。提倡在开工之前的设计环节为未来做足打算，但是也不要因此变成设计狂魔。上机题是为了在比较小的工作量下让大家了解基础内容，所以才会抽象出各种各样不现实的场景。如果像某次实验的“文件”那样，在工作量上并不友好。本题的
 ShapeFactories.makeShape 也是策略模式的应用。
+
+### 3. 匿名类的ShapeFactory `编程题`
+在前面实验的 `Shape` 的基础上，定义一个满足如下需求的 `IShapeFactory` 接口：
+- 具有方法 `Shape makeShape(double a, double b)` ，返回一个由 a 和 b 指定大小的
+  形状；
+  + 参数不合法时，返回 null 或抛出异常
+  
+用单例模式+工厂方法模式的思想修改矩形、椭圆、菱形类：
+- 每一个类都增设一个 `private static IShapeFactory factory` 字段
+  + 类中的 factory 用于生成该类的形状对象 
+    - 比如 Rectangle 类中的 factory，其 makeShape 方法返回 Rectangle 对象
+  + 直接使用匿名类为 factory 进行静态初始化，不允许像 ShapeFactory2 那样定义工厂类 
+- 进行其他的修改，使外界的其他类能够获取到 factory 并成功构造形状对象
+  
+选择你认为合适的方式编写测试类：
+- 你的测试类应该能够覆盖到所有等价类。
+- 测试形式可以是单元测试，被测对象的形式可以参考之前实验中的 `ShapeFactoriesTest.makeShape` 方法。
+- 在代码注释中（或者与代码一起提交一个 readme），描述你的测试计划
+
+#### 题外话：
+使用匿名类，依然是为每一个形状创建了一个对应的工厂，因此本质上依然是工厂方法模式，区别在于不用显式定义新的类（据说编码过程中，起名字是最麻烦的事情）。
+
+工厂方法模式的应用中，每一种工厂通常只有一个实例，因此它经常和单例模式一起被使用。
