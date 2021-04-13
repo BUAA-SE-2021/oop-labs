@@ -446,3 +446,44 @@ ShapeFactories.makeShape 也是策略模式的应用。
 使用匿名类，依然是为每一个形状创建了一个对应的工厂，因此本质上依然是工厂方法模式，区别在于不用显式定义新的类（据说编码过程中，起名字是最麻烦的事情）。
 
 工厂方法模式的应用中，每一种工厂通常只有一个实例，因此它经常和单例模式一起被使用。
+
+### 4. ShapeSequence `编程题`
+
+> 这是一个主动要求大家造轮子的题，因此不允许继承或组合任何 java 自带的容器（除了数组），并且本题还会出现在后续实验。
+> 本题假设大家在算法上机时能够较为熟练的使用 C++中 STL 容器，并至少对变长容器的迭代访问有一定了解。
+
+在 `Shape` 的基础上，定义一个满足如下需求的 `ShapeSequence` 类：
+- 具有属性 `private Shape[] shapes`
+- 构造方法 `ShapeList(int size)`
+  + size 用于指定 shapes 的最大长度，如果 size 是负数，那么按照 0 来处理。
+  + 构造方法中应当对 shapes 进行初始化赋值，在其他过程中 shapes 的大小不应该被改变
+- 方法 `public void add(Shape shape)`
+  + 向 shapes 中添加一个新的元素
+  + 当 shapes 被填满时，什么都不做
+- 方法 `public String toString()`
+  + 返回这个容器的字符串表达，格式为`[Type, Type,...]`
+  + 格式中的 Type 是形状类型的全小写英文单词，比如 rectangle、ellipse
+- 方法 `public SequenceIterator iterator() {return new SequenceIterator();}`
+- 具有内部类 `private class SequenceIterator`，它用于序列遍历的迭代器
+  + 默认构造方法，在被构造时，迭代器指向的位置代表数组下标 0
+  + 方法 `public boolean isEnd()`，迭代器完成遍历时，返回 true
+    - 完成遍历不代表迭代器指向了最后一个元素，而是指向了最后一个元素的下一个位置
+  + 方法 `public Shape current()`，返回当前迭代器指向位置的 Shape 对象
+    - isEnd()是 true 时，访问 current 是非法操作
+  + 方法 `public void moveNext()`，使迭代器移动到下一个元素的位置 
+    - isEnd()是 true 时，什么都不做
+  + 方法 `public boolean equals(Object o)`，当 o 是 SequenceItetator 类型的、且 o 和 this 的外部类对象相同、且 o 和 this 的位置相同时，返回 true
+  
+编写测试类并描述你的测试计划。
+  
+#### 注意
+**toString 和 equals 是 override 继承自 Object 的方法，如果这次再出现诸如 ToString、equals 的参数类型不是 Object（这种情况会算作 overload，详情参阅 LAB05 反馈）等情况，直接不给分了。**
+  
+题目中省略了一些实现上必要但是方式不唯一的属性：比如你可以在 ShapeSequence 类中声明一个 int 属性来表示当前容器被填充到了什么位置；给 SequenceIterator 一个 int 属性表示当前迭代器指向的位置，当使用 isEnd 时，判断迭代器位置和外部类容器的填充位置进行比较。
+  
+#### 题外话
+本题的目的是进行内部类、Object 相关的综合实践，通过使用自定义的迭代器和容器，提前复习 C++基础并理解一些基础概念。后续容器和泛型课程中，会引入可变长容器以及匿名类实现的迭代器。虽然我们上机并不评测程序的性能，但是在实现本题的 toString 时，还是推荐考虑使用 StringBuilder。
+
+你可以考虑一下不使用内部类时要如何实现迭代器，内部类为这种数据访问是否带来了足够的便利？
+
+为什么 SequenceIterator 被限定为了 private
